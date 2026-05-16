@@ -1,0 +1,60 @@
+Ground truth:
+- Total ground-truth blink annotations: 14
+- Ideal CSV file: case_1.csv
+- Annotation label used in the CSV files: blink
+
+case_1.csv:
+- Total predicted annotations: 14
+- Expected: 14 TP, 0 FP, 0 FN
+- Precision: 1.0
+- Recall: 1.0
+- F1: 1.0
+- Interpretation: perfect event-level match
+
+Relative to ideal CSV:
+- Added annotations: none
+- Dropped annotations: none
+- All 14 annotations are exactly the same as the ground truth.
+
+case_2.csv:
+- Total predicted annotations: 16
+- 14 predictions match the 14 ground-truth annotations
+- 2 predictions are extra detections
+- Expected: 14 TP, 2 FP, 0 FN
+- Precision: 14 / 16 = 0.875
+- Recall: 14 / 14 = 1.0
+- F1: 0.9333
+- Interpretation: all ground-truth blinks are found, but there are 2 false alarms
+
+Relative to ideal CSV:
+- Dropped annotations: none
+- Added annotations: 2 false-positive annotations
+
+Added false-positive annotations:
+1. onset = 10.000000, duration = 0.200000, description = blink
+2. onset = 300.000000, duration = 0.200000, description = blink
+
+case_3.csv:
+- Total predicted annotations: 12
+- 10 predictions match ground-truth annotations
+- 2 predictions are extra detections
+- 4 ground-truth annotations are missed
+- Expected: 10 TP, 2 FP, 4 FN
+- Precision: 10 / 12 = 0.8333
+- Recall: 10 / 14 = 0.7143
+- F1: 0.7692
+- Interpretation: some blinks are detected, some are missed, and there are 2 false alarms
+
+Relative to ideal CSV:
+- Added annotations: 2 false-positive annotations
+- Dropped annotations: 4 ground-truth annotations
+
+Added false-positive annotations:
+1. onset = 10.000000, duration = 0.200000, description = blink
+2. onset = 300.000000, duration = 0.200000, description = blink
+
+Dropped ground-truth annotations:
+1. onset = 231.583450, duration = 0.191360, description = blink
+2. onset = 233.975418, duration = 0.140701, description = blink
+3. onset = 235.332901, duration = 0.151962, description = blink
+4. onset = 261.245758, duration = 0.118195, description = blink
