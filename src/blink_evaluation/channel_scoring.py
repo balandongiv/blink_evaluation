@@ -20,6 +20,12 @@ class ChannelEvaluationResult:
     lane_summary: pd.DataFrame
     best_channel: str | None
     best_eval_result: EvaluationResult | None
+    best_channel_result: dict | None
+    """Full channel-result dict for the best channel (includes ``signal_by_epoch``,
+    ``mapped_candidates``, ``df_positions``, and any strategy-specific keys)."""
+    best_predicted: pd.DataFrame | None
+    """Enriched predictions DataFrame for the best channel
+    (has ``absolute_onset_s`` / ``absolute_offset_s`` columns)."""
 
 
 def evaluate_channels(
@@ -52,6 +58,8 @@ def evaluate_channels(
     lane_rows: list[dict] = []
     best_channel: str | None = None
     best_eval_result: EvaluationResult | None = None
+    best_channel_result: dict | None = None
+    best_predicted: pd.DataFrame | None = None
 
     for cr in channel_results:
         predicted_df = enrich_absolute_times(cr["mapped_candidates"], epoch_duration)
@@ -92,6 +100,8 @@ def evaluate_channels(
         ):
             best_channel = cr["channel"]
             best_eval_result = result
+            best_channel_result = cr
+            best_predicted = predicted_df
 
     lane_summary = (
         pd.DataFrame(lane_rows)
@@ -103,6 +113,8 @@ def evaluate_channels(
         lane_summary=lane_summary,
         best_channel=best_channel,
         best_eval_result=best_eval_result,
+        best_channel_result=best_channel_result,
+        best_predicted=best_predicted,
     )
 
 
