@@ -179,7 +179,30 @@ def evaluate_channels(
                 false_negatives=fn_events,
                 sample_confusion=sample_confusion,
             )
-
+        else:
+            gt_events = annotations_to_events(gt_annotations, "blink")
+            pred_events = annotations_to_events(pred_annotations, "blink")
+            sample_metrics, sample_confusion = compute_sample_metrics(
+                gt_events, pred_events, sample_rate=100.0, recording_duration=None
+            )
+            tp_events, fp_events, fn_events = match_events(
+                gt_events,
+                pred_events,
+                iou_threshold=iou_threshold,
+                peak_required=False,
+                peak_tolerance=None,
+            )
+            combined_events = _combine_scored_events(tp_events, fp_events, fn_events, pred_events)
+            event_metrics = compute_event_metrics(tp_events, len(gt_events), len(pred_events))
+            result = EvaluationResult(
+                event_metrics=event_metrics,
+                sample_metrics=sample_metrics,
+                matches=tp_events,
+                true_positives=tp_events,
+                false_positives=fp_events,
+                false_negatives=fn_events,
+                sample_confusion=sample_confusion,
+            )
 
         em = result.event_metrics
         lane_rows.append(
