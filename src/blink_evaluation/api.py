@@ -22,6 +22,13 @@ def evaluate_annotations(
     gt_events = annotations_to_events(ground_truth, target_label)
     pred_events = annotations_to_events(predicted, target_label)
 
+    sample_metrics, sample_confusion = compute_sample_metrics(
+        gt_events,
+        pred_events,
+        sample_rate=sample_rate,
+        recording_duration=recording_duration,
+    )
+
     matches, false_positives, false_negatives = match_events(
         gt_events,
         pred_events,
@@ -32,13 +39,6 @@ def evaluate_annotations(
     )
 
     event_metrics = compute_event_metrics(matches, len(gt_events), len(pred_events))
-
-    sample_metrics, sample_confusion = compute_sample_metrics(
-        gt_events,
-        pred_events,
-        sample_rate=sample_rate,
-        recording_duration=recording_duration,
-    )
 
     return EvaluationResult(
         event_metrics=event_metrics,

@@ -7,9 +7,14 @@ from dataclasses import dataclass, field
 class AnnotationEvent:
     index: int
     onset: float
-    duration: float
+    duration: float | None
     description: str
     peak_time: float | None = None
+    status: str | None = None          # 'tp', 'fp', or 'fn' after scoring
+    onset_pred: float | None = None
+    onset_gt: float | None = None
+    duration_pred: float | None = None
+    duration_gt: float | None = None
 
 
 @dataclass
@@ -20,6 +25,13 @@ class Match:
     iou_expanded: float
     peak_delta: float | None
     accepted: bool
+    # enriched fields populated after matching
+    status: str | None = None          # always 'tp'
+    onset_pred: float | None = None
+    onset_gt: float | None = None
+    duration_pred: float | None = None
+    duration_gt: float | None = None
+    peak_time: float | None = None     # prediction peak time
 
 
 @dataclass

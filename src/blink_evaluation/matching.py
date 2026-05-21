@@ -36,6 +36,50 @@ def _build_cost_matrix(
     return matrix
 
 
+def _enrich_events(
+    tp_events: list[Match],
+    fp_events: list[AnnotationEvent],
+    fn_events: list[AnnotationEvent],
+    gt_events: list[AnnotationEvent],
+    pred_events: list[AnnotationEvent],
+) -> None:
+    """Fill status and both-sided timing fields in-place on all returned objects."""
+    gt_by_idx = {ev.index: ev for ev in gt_events}
+    pred_by_idx = {ev.index: ev for ev in pred_events}
+
+    for m in tp_events:
+        gt_ev = gt_by_idx[m.gt_index]
+        pred_ev = pred_by_idx[m.pred_index]
+        m.status = "tp"
+        m.onset_pred = pred_ev.onset
+        m.onset_gt = gt_ev.onset
+        m.duration_pred = pred_ev.duration
+        m.duration_gt = gt_ev.duration
+        m.peak_time = pred_ev.peak_time
+        pred_ev.status = "tp"
+        pred_ev.onset_pred = pred_ev.onset
+        pred_ev.onset_gt = gt_ev.onset
+        pred_ev.duration_pred = pred_ev.duration
+        pred_ev.duration_gt = gt_ev.duration
+        pred_ev.duration = None
+
+    for ev in fp_events:
+        ev.status = "fp"
+        ev.onset_pred = ev.onset
+        ev.onset_gt = None
+        ev.duration_pred = ev.duration
+        ev.duration_gt = None
+        ev.duration = None
+
+    for ev in fn_events:
+        ev.status = "fn"
+        ev.onset_pred = None
+        ev.onset_gt = ev.onset
+        ev.duration_pred = None
+        ev.duration_gt = ev.duration
+        ev.duration = None
+
+
 def match_events(
     gt_events: list[AnnotationEvent],
     pred_events: list[AnnotationEvent],
@@ -45,14 +89,17 @@ def match_events(
     peak_tolerance: float | None = None,
 ) -> tuple[list[Match], list[AnnotationEvent], list[AnnotationEvent]]:
     if not gt_events or not pred_events:
-        return [], list(pred_events), list(gt_events)
+        fp_events = list(pred_events)
+        fn_events = list(gt_events)
+        _enrich_events([], fp_events, fn_events, gt_events, pred_events)
+        return [], fp_events, fn_events
 
     cost_expanded = _build_cost_matrix(gt_events, pred_events, pad, peak_required, peak_tolerance)
     cost_raw = _build_cost_matrix(gt_events, pred_events, 0.0, False, None)
 
     row_ind, col_ind = linear_sum_assignment(cost_expanded, maximize=True)
 
-    matches: list[Match] = []
+    tp_events: list[Match] = []
     matched_gt: set[int] = set()
     matched_pred: set[int] = set()
 
@@ -72,7 +119,7 @@ def match_events(
         else:
             peak_delta = None
 
-        matches.append(
+        tp_events.append(
             Match(
                 gt_index=gt_events[i].index,
                 pred_index=pred_events[j].index,
@@ -85,7 +132,9 @@ def match_events(
         matched_gt.add(i)
         matched_pred.add(j)
 
-    false_positives = [pred_events[j] for j in range(len(pred_events)) if j not in matched_pred]
-    false_negatives = [gt_events[i] for i in range(len(gt_events)) if i not in matched_gt]
+    fp_events = [pred_events[j] for j in range(len(pred_events)) if j not in matched_pred]
+    fn_events = [gt_events[i] for i in range(len(gt_events)) if i not in matched_gt]
 
-    return matches, false_positives, false_negatives
+    _enrich_events(tp_events, fp_events, fn_events, gt_events, pred_events)
+
+    return tp_events, fp_events, fn_events

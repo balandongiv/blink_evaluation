@@ -79,8 +79,8 @@ def plot_annotation_comparison(
         pred = pred_by_idx.get(m.pred_index)
         if gt is None or pred is None:
             continue
-        span_start = min(gt.onset, pred.onset)
-        span_end = max(gt.onset + gt.duration, pred.onset + pred.duration)
+        span_start = min(m.onset_gt, m.onset_pred)
+        span_end = max(m.onset_gt + m.duration_gt, m.onset_pred + m.duration_pred)
         label = "TP" if not tp_labeled else None
         ax.axvspan(span_start, span_end, alpha=0.25, color="green", label=label)
         tp_labeled = True
@@ -89,14 +89,14 @@ def plot_annotation_comparison(
     fp_labeled = False
     for fp in result.false_positives:
         label = "FP" if not fp_labeled else None
-        ax.axvspan(fp.onset, fp.onset + fp.duration, alpha=0.35, color="red", label=label)
+        ax.axvspan(fp.onset, fp.onset + fp.duration_pred, alpha=0.35, color="red", label=label)
         fp_labeled = True
 
     # FN spans (blue)
     fn_labeled = False
     for fn in result.false_negatives:
         label = "FN" if not fn_labeled else None
-        ax.axvspan(fn.onset, fn.onset + fn.duration, alpha=0.35, color="royalblue", label=label)
+        ax.axvspan(fn.onset, fn.onset + fn.duration_gt, alpha=0.35, color="royalblue", label=label)
         fn_labeled = True
 
     em = result.event_metrics
@@ -183,7 +183,7 @@ def create_html_report(
 
     # --- FP table ---
     fp_rows = [
-        [fp.index, f"{fp.onset:.6f}", f"{fp.duration:.6f}", fp.description]
+        [fp.index, f"{fp.onset:.6f}", f"{fp.duration_pred:.6f}", fp.description]
         for fp in result.false_positives
     ]
     fp_html = "<h3>False Positives</h3>" + (
@@ -193,7 +193,7 @@ def create_html_report(
 
     # --- FN table ---
     fn_rows = [
-        [fn.index, f"{fn.onset:.6f}", f"{fn.duration:.6f}", fn.description]
+        [fn.index, f"{fn.onset:.6f}", f"{fn.duration_gt:.6f}", fn.description]
         for fn in result.false_negatives
     ]
     fn_html = "<h3>False Negatives</h3>" + (
