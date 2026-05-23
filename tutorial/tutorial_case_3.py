@@ -1,4 +1,4 @@
-﻿"""
+"""
 Tutorial -- Case 3: Missed Blinks and Spurious Detections (FP + FN)
 ====================================================================
 Ground truth : case_1.csv  (14 blink annotations)

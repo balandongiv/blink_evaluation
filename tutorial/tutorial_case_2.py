@@ -1,4 +1,4 @@
-﻿"""
+"""
 Tutorial -- Case 2: Two Spurious Detections (False Positives)
 =============================================================
 Ground truth : case_1.csv  (14 blink annotations)

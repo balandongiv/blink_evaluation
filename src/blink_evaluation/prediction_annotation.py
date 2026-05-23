@@ -205,7 +205,7 @@ def export_scored_prediction_csv(
             r"D:\\dataset\\...\\annotation_prediction\\ear_eog_predicted_{strategy}.csv"
         )
         out = export_scored_prediction_csv(
-            scored, gt_annotations, strategy="strategy_f", csv_path_template=CSV_PATH
+            scored, gt_annotations, strategy="strategy_dbo_drop", csv_path_template=CSV_PATH
         )
 
     Parameters
