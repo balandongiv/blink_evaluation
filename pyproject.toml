@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blink-evaluation"
-version = "0.1.0"
+version = "0.1.1"
 description = "Evaluate blink-detection annotations in time-series EEG/MEG data"
 readme = "README.md"
 requires-python = ">=3.10"
